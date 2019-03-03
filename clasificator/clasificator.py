@@ -78,14 +78,9 @@ print(decision_tree.score(test_features, test_target))
 
 ## Plotts
 
-import graphviz
-
 # DOT: Graph description language
-dot_data = tree.export_graphviz(decision_tree, out_file=None,
+dot_data = tree.export_graphviz(decision_tree, out_file='plots/test.gv',
                                 feature_names=list(ww_dataset)[:11],
                                 class_names=list(ww_dataset)[11],
                                 filled=True, rounded=True,
                                 special_characters=True)
-
-graph = graphviz.Source(dot_data)
-graph.render('plots/test.gv', view=False)
