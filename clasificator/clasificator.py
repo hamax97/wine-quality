@@ -1,10 +1,10 @@
 ##################### Obtain wine datase from .csv file
 
 def read_csv(location, sep=';'):
-    
+
   # File reader library
   import pandas as pd
-  
+
   data = pd.read_csv(location, sep)
   return data
 
@@ -18,12 +18,20 @@ def split_dataset(dataset):
     features = matrix[:,:11]
     target = matrix[:,11]
 
+    # Classify into Good and Bad wines
+    for i in range(len(target)):
+
+      if target[i] > 5: # Good wine
+        target[i] = 1
+      else: # Bad wine
+        target[i] = 0
+
     # Split dataset
     from sklearn.model_selection import train_test_split
 
     train_features, test_features, train_target, test_target = \
       train_test_split(features, target, test_size=0.30)
-    
+
     return train_features, test_features, train_target, test_target
 
 ##################### Fit models
@@ -34,7 +42,7 @@ from sklearn import tree
 def fit_logistic_regression(train_features, train_target):
   logistic_regression = \
     linear_model.LogisticRegression(solver='lbfgs', multi_class='multinomial')
-  
+
   logistic_regression.fit(train_features, train_target)
   return logistic_regression
 
@@ -46,12 +54,14 @@ def fit_decision_tree(train_features, train_target):
 
 ##################### Main
 
+import sys
+
 ##### Obtain dataset and split into training and test
 
-# White wine dataset
-ww_dataset = read_csv(location = '../whitewine.csv')
+## White wine dataset
+ww_dataset = read_csv(location = sys.argv[1])
 
-# Split dataset into train and test
+## Split dataset into train and test
 train_features, test_features, train_target, test_target = \
   split_dataset(ww_dataset)
 
@@ -60,8 +70,22 @@ train_features, test_features, train_target, test_target = \
 logistic_regression = fit_logistic_regression(train_features, train_target)
 decision_tree = fit_decision_tree(train_features, train_target)
 
-# Models accuracy
+## Models accuracy
 print('Logistic regression accuracy: ')
 print(logistic_regression.score(test_features, test_target))
 print('Decision tree accuracy: ')
 print(decision_tree.score(test_features, test_target))
+
+## Plotts
+
+import graphviz
+
+# DOT: Graph description language
+dot_data = tree.export_graphviz(decision_tree, out_file=None,
+                                feature_names=list(ww_dataset)[:11],
+                                class_names=list(ww_dataset)[11],
+                                filled=True, rounded=True,
+                                special_characters=True)
+
+graph = graphviz.Source(dot_data)
+graph.render('plots/test.gv', view=False)
