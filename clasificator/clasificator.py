@@ -12,19 +12,9 @@ def read_csv(location, sep=';'):
 
 def split_dataset(dataset):
 
-    # Convert the dataset into a matrix
-    matrix = dataset.to_numpy()
     # Doesn't include the last column, which is the target
-    features = matrix[:,:11]
-    target = matrix[:,11]
-
-    # Classify into Good and Bad wines
-    for i in range(len(target)):
-
-      if target[i] > 5: # Good wine
-        target[i] = 1
-      else: # Bad wine
-        target[i] = 0
+    features = dataset[:,:11]
+    target = dataset[:,11]
 
     # Split dataset
     from sklearn.model_selection import train_test_split
@@ -33,6 +23,20 @@ def split_dataset(dataset):
       train_test_split(features, target, test_size=0.30)
 
     return train_features, test_features, train_target, test_target
+
+def transform_target_values(target):
+
+  transformed_target = target.copy()
+  
+  # Classify into Good and Bad wines
+  for i in range(len(target)):
+    
+    if transformed_target[i] > 5: # Good wine
+      transformed_target[i] = 1
+    else: # Bad wine
+      transformed_target[i] = 0
+
+  return transformed_target
 
 ##################### Fit models
 
@@ -52,6 +56,12 @@ def fit_decision_tree(train_features, train_target):
 
   return decision_tree
 
+def fit_linear_regression(train_features, train_target):
+  linear_regression = linear_model.LinearRegression()
+  linear_regression.fit(train_features, train_target)
+  
+  return linear_regression
+
 ##################### Main
 
 import sys
@@ -61,30 +71,57 @@ import numpy as np
 
 ## White wine dataset
 ww_dataset = read_csv(location = sys.argv[1])
+ww_dataset_labels = list(ww_dataset)[:11]
+# Converts dataset into matrix
+ww_dataset_values = ww_dataset.to_numpy()
 
 ## Split dataset into train and test
 train_features, test_features, train_target, test_target = \
-  split_dataset(ww_dataset)
+  split_dataset(ww_dataset_values)
+
+# Used to train the classification models
+classification_train_target = transform_target_values(train_target)
+classification_test_target = transform_target_values(test_target)
 
 #### Train models
 
+## Classification models
 for i in range(11):
   print(i)
   logistic_regression = fit_logistic_regression(np.reshape(train_features[:,i], (-1, 1)),
-                                                train_target)
-  decision_tree = fit_decision_tree(np.reshape(train_features[:,i], (-1, 1)), train_target)
+                                                classification_train_target)
+  decision_tree = fit_decision_tree(np.reshape(train_features[:,i], (-1, 1)),
+                                    classification_train_target)
 
   ## Models accuracy
   print('Logistic regression accuracy: ')
-  print(logistic_regression.score(np.reshape(test_features[:,i], (-1, 1)), test_target))
+  print(logistic_regression.score(np.reshape(test_features[:,i], (-1, 1)),
+                                  classification_test_target))
   print('Decision tree accuracy: ')
-  print(decision_tree.score(np.reshape(test_features[:,i], (-1, 1)), test_target))
+  print(decision_tree.score(np.reshape(test_features[:,i], (-1, 1)),
+                            classification_test_target))
+
+  
+linear_regression = fit_linear_regression(train_features, train_target)
+
+## Linear regression
+
+from sklearn.feature_selection import chi2
+
+scores, pvalues = chi2(ww_dataset_values[:,:11], ww_dataset_values[:,11])
+                           
+print('Linear regression accuracy: ')
+print(linear_regression.score(test_features, test_target))
+
+print('P-values: ')
+print(ww_dataset_labels)
+print(pvalues)
 
 ## Plotts
 
 # DOT: Graph description language
 # dot_data = tree.export_graphviz(decision_tree, out_file='plots/test.gv',
-#                                 feature_names=list(ww_dataset)[:11],
+#                                 feature_names=ww_dataset_labels,
 #                                 class_names=list(ww_dataset)[11],
 #                                 filled=True, rounded=True,
 #                                 special_characters=True)
