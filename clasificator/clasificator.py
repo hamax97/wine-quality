@@ -55,6 +55,7 @@ def fit_decision_tree(train_features, train_target):
 ##################### Main
 
 import sys
+import numpy as np
 
 ##### Obtain dataset and split into training and test
 
@@ -69,15 +70,15 @@ train_features, test_features, train_target, test_target = \
 
 for i in range(11):
   print(i)
-  logistic_regression = fit_logistic_regression(train_features[:][i],
+  logistic_regression = fit_logistic_regression(np.reshape(train_features[:,i], (-1, 1)),
                                                 train_target)
-  decision_tree = fit_decision_tree(train_features[:][i], train_target)
+  decision_tree = fit_decision_tree(np.reshape(train_features[:,i], (-1, 1)), train_target)
 
   ## Models accuracy
   print('Logistic regression accuracy: ')
-  print(logistic_regression.score(test_features, test_target))
+  print(logistic_regression.score(np.reshape(test_features[:,i], (-1, 1)), test_target))
   print('Decision tree accuracy: ')
-  print(decision_tree.score(test_features, test_target))
+  print(decision_tree.score(np.reshape(test_features[:,i], (-1, 1)), test_target))
 
 ## Plotts
 

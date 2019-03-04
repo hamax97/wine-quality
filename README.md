@@ -9,6 +9,7 @@ Install the required modules, where <your-env> is the virtual environment that y
 
 ```
 $ conda install -n <your-env> scikit-learn
+$ conda install -n <your-env> numpy
 $ conda install -n <your-env> pandas
 $ conda install -n <your-env> graphviz
 $ conda install -n <your-env> python-graphviz
