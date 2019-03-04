@@ -20,7 +20,7 @@ def split_dataset(dataset):
     from sklearn.model_selection import train_test_split
 
     train_features, test_features, train_target, test_target = \
-      train_test_split(features, target, test_size=0.30)
+      train_test_split(features, target, test_size=0.30, random_state=7)
 
     return train_features, test_features, train_target, test_target
 
@@ -71,7 +71,8 @@ import numpy as np
 
 ## White wine dataset
 ww_dataset = read_csv(location = sys.argv[1])
-ww_dataset_labels = list(ww_dataset)[:11]
+ww_feature_labels = list(ww_dataset)[:11]
+ww_target_label = list(ww_dataset)[11]
 # Converts dataset into matrix
 ww_dataset_values = ww_dataset.to_numpy()
 
@@ -86,13 +87,15 @@ classification_test_target = transform_target_values(test_target)
 #### Train models
 
 ## Classification models
+
+## Classification models
 for i in range(11):
   print(i)
   logistic_regression = fit_logistic_regression(np.reshape(train_features[:,i], (-1, 1)),
                                                 classification_train_target)
   decision_tree = fit_decision_tree(np.reshape(train_features[:,i], (-1, 1)),
                                     classification_train_target)
-
+  
   ## Models accuracy
   print('Logistic regression accuracy: ')
   print(logistic_regression.score(np.reshape(test_features[:,i], (-1, 1)),
@@ -101,28 +104,51 @@ for i in range(11):
   print(decision_tree.score(np.reshape(test_features[:,i], (-1, 1)),
                             classification_test_target))
 
-  
-linear_regression = fit_linear_regression(train_features, train_target)
 
+  
+  dot_data = tree.export_graphviz(decision_tree, out_file='plots/%s.gv' % i,
+                                  feature_names=ww_feature_labels[i:i+1],
+                                  class_names=ww_target_label,
+                                  filled=True, rounded=True,
+                                  special_characters=True)
+
+
+# logistic_regression = fit_logistic_regression(train_features[:, [5,6]],
+#                                               classification_train_target)
+  
+# decision_tree = fit_decision_tree(train_features[:, [5,6]],
+#                                   classification_train_target)
+  
+# ## Models accuracy
+# print('Logistic regression accuracy: ')
+# print(logistic_regression.score(test_features[:, [5,6]],
+#                                 classification_test_target))
+# print('Decision tree accuracy: ')
+# print(decision_tree.score(test_features[:, [5,6]],
+#                           classification_test_target))
+
+  
 ## Linear regression
 
-from sklearn.feature_selection import chi2
+# linear_regression = fit_linear_regression(train_features, train_target)
 
-scores, pvalues = chi2(ww_dataset_values[:,:11], ww_dataset_values[:,11])
+# from sklearn.feature_selection import chi2
+
+# scores, pvalues = chi2(ww_dataset_values[:,:11], ww_dataset_values[:,11])
                            
-print('Linear regression accuracy: ')
-print(linear_regression.score(test_features, test_target))
+# print('Linear regression accuracy: ')
+# print(linear_regression.score(test_features, test_target))
 
-print('P-values: ')
-print(ww_dataset_labels)
-print(pvalues)
+# print('P-values: ')
+# print(ww_feature_labels)
+# print(pvalues)
 
 ## Plotts
 
 # DOT: Graph description language
-# dot_data = tree.export_graphviz(decision_tree, out_file='plots/test.gv',
-#                                 feature_names=ww_dataset_labels,
-#                                 class_names=list(ww_dataset)[11],
+# dot_data = tree.export_graphviz(decision_tree, out_file='plots/5and6.gv',
+#                                 feature_names=ww_feature_labels[5:7],
+#                                 class_names=ww_target_label,
 #                                 filled=True, rounded=True,
 #                                 special_characters=True)
 
