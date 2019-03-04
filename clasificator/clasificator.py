@@ -67,20 +67,24 @@ train_features, test_features, train_target, test_target = \
 
 #### Train models
 
-logistic_regression = fit_logistic_regression(train_features, train_target)
-decision_tree = fit_decision_tree(train_features, train_target)
+for i in range(11):
+  print(i)
+  logistic_regression = fit_logistic_regression(train_features[:][i],
+                                                train_target)
+  decision_tree = fit_decision_tree(train_features[:][i], train_target)
 
-## Models accuracy
-print('Logistic regression accuracy: ')
-print(logistic_regression.score(test_features, test_target))
-print('Decision tree accuracy: ')
-print(decision_tree.score(test_features, test_target))
+  ## Models accuracy
+  print('Logistic regression accuracy: ')
+  print(logistic_regression.score(test_features, test_target))
+  print('Decision tree accuracy: ')
+  print(decision_tree.score(test_features, test_target))
 
 ## Plotts
 
 # DOT: Graph description language
-dot_data = tree.export_graphviz(decision_tree, out_file='plots/test.gv',
-                                feature_names=list(ww_dataset)[:11],
-                                class_names=list(ww_dataset)[11],
-                                filled=True, rounded=True,
-                                special_characters=True)
+# dot_data = tree.export_graphviz(decision_tree, out_file='plots/test.gv',
+#                                 feature_names=list(ww_dataset)[:11],
+#                                 class_names=list(ww_dataset)[11],
+#                                 filled=True, rounded=True,
+#                                 special_characters=True)
+
