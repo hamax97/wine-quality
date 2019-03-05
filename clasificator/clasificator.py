@@ -24,6 +24,7 @@ def split_dataset(dataset):
 
     return train_features, test_features, train_target, test_target
 
+# If the target is > 5 it's a good wine. Bad wine in other case
 def transform_target_values(target):
 
   transformed_target = target.copy()
@@ -51,7 +52,7 @@ def fit_logistic_regression(train_features, train_target):
   return logistic_regression
 
 def fit_decision_tree(train_features, train_target):
-  decision_tree = tree.DecisionTreeClassifier()
+  decision_tree = tree.DecisionTreeClassifier(max_depth=5)
   decision_tree.fit(train_features, train_target)
 
   return decision_tree
@@ -61,6 +62,18 @@ def fit_linear_regression(train_features, train_target):
   linear_regression.fit(train_features, train_target)
   
   return linear_regression
+
+##################### Plotts and Graphs
+
+import matplotlib.pyplot as plt
+
+def x_vs_y(x, x_label, y, y_label, title, save_path):
+  plt.figure()
+  plt.scatter(x, y, s=20, edgecolor="black", c="darkorange", label="data")
+  plt.xlabel(x_label)
+  plt.ylabel(y_label)
+  plt.title(title)
+  plt.savefig(save_path)
 
 ##################### Main
 
@@ -90,27 +103,30 @@ classification_test_target = transform_target_values(test_target)
 
 ## Classification models
 for i in range(11):
+
+  x_vs_y(ww_dataset_values[:,i], ww_feature_labels[i], ww_dataset_values[:,11], ww_target_label, '%s vs quality' % ww_feature_labels[i], 'plots/scatters/%s.png' % i)
+  
   print(i)
-  logistic_regression = fit_logistic_regression(np.reshape(train_features[:,i], (-1, 1)),
-                                                classification_train_target)
-  decision_tree = fit_decision_tree(np.reshape(train_features[:,i], (-1, 1)),
-                                    classification_train_target)
+  #logistic_regression = fit_logistic_regression(np.reshape(train_features[:,i], (-1, 1)),
+   #                                             classification_train_target)
+  #decision_tree = fit_decision_tree(np.reshape(train_features[:,i], (-1, 1)),
+    #                                classification_train_target)
   
   ## Models accuracy
-  print('Logistic regression accuracy: ')
-  print(logistic_regression.score(np.reshape(test_features[:,i], (-1, 1)),
-                                  classification_test_target))
-  print('Decision tree accuracy: ')
-  print(decision_tree.score(np.reshape(test_features[:,i], (-1, 1)),
-                            classification_test_target))
+  #print('Logistic regression accuracy: ')
+  #print(logistic_regression.score(np.reshape(test_features[:,i], (-1, 1)),
+     #                             classification_test_target))
+  #print('Decision tree accuracy: ')
+  #print(decision_tree.score(np.reshape(test_features[:,i], (-1, 1)),
+      #                      classification_test_target))
 
 
   
-  dot_data = tree.export_graphviz(decision_tree, out_file='plots/%s.gv' % i,
-                                  feature_names=ww_feature_labels[i:i+1],
-                                  class_names=ww_target_label,
-                                  filled=True, rounded=True,
-                                  special_characters=True)
+  #dot_data = tree.export_graphviz(decision_tree, out_file='plots/%s.gv' % i,
+#                                  feature_names=ww_feature_labels[i:i+1],
+ #                                 class_names=ww_target_label,
+  #                                filled=True, rounded=True,
+  #                                special_characters=True)
 
 
 # logistic_regression = fit_logistic_regression(train_features[:, [5,6]],

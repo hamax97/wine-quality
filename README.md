@@ -13,9 +13,10 @@ $ conda install -n <your-env> numpy
 $ conda install -n <your-env> pandas
 $ conda install -n <your-env> graphviz
 $ conda install -n <your-env> python-graphviz
+$ conda install -n <your-env> matplotlib
 ```
 
-Visualize graphs.
+Visualize graphs( .gz).
 ```
 $ dot -Tpng <file>.gz -o <file>.png
 ```
