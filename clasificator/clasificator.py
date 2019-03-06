@@ -5,7 +5,7 @@ def read_csv(location, sep=';'):
   # File reader library
   import pandas as pd
 
-  data = pd.read_csv(location, sep, usecols=[0,1,2,3,4,5,6,7,8,9,10])
+  data = pd.read_csv(location, sep)
   return data
 
 ##################### Split dataset into training and test datasets
@@ -52,7 +52,7 @@ def fit_logistic_regression(train_features, train_target):
   return logistic_regression
 
 def fit_decision_tree(train_features, train_target):
-  decision_tree = tree.DecisionTreeClassifier(max_depth=5)
+  decision_tree = tree.DecisionTreeClassifier()
   decision_tree.fit(train_features, train_target)
 
   return decision_tree
@@ -66,7 +66,7 @@ def fit_linear_regression(train_features, train_target):
 ##################### Plotts and Graphs
 
 import matplotlib.pyplot as plt
-import seaborn as sns
+#import seaborn as sns
 
 def x_vs_y(x, x_label, y, y_label, title, save_path):
   plt.figure()
@@ -80,7 +80,6 @@ def correlation_matrix(frame, save_path):
 
   #Create Correlation df
   corr = frame.corr()
-  print(corr.columns)
   #Plot figsize
   fig, ax = plt.subplots(figsize=(12, 14))
   #Generate Color Map
@@ -92,14 +91,7 @@ def correlation_matrix(frame, save_path):
   #Apply yticks
   plt.yticks(range(len(corr.columns)), corr.columns)
   plt.title('correlation matrix')
-  #show plot
-  #plt.show()
 
-  #sns.heatmap(frame.corr(), annot=True, fmt=".2f")
-  #plt.matshow(frame.corr())
-  #plt.xticks(range(len(frame.columns)), frame.columns)
-  #plt.yticks(range(len(frame.columns)), frame.columns)
-  #plt.colorbar()
   plt.savefig(save_path)
 
 ##################### Main
@@ -111,79 +103,74 @@ import numpy as np
 
 ## White wine dataset
 ww_dataset = read_csv(location = sys.argv[1])
-#ww_feature_labels = list(ww_dataset)[:11]
-#ww_target_label = list(ww_dataset)[11]
+ww_feature_labels = list(ww_dataset)[:11]
+ww_target_label = list(ww_dataset)[11]
 # Converts dataset into matrix
 ww_dataset_values = ww_dataset.to_numpy()
 
 ## Split dataset into train and test
-#train_features, test_features, train_target, test_target = \
-#  split_dataset(ww_dataset_values)
+train_features, test_features, train_target, test_target = \
+  split_dataset(ww_dataset_values)
 
 # Used to train the classification models
-#classification_train_target = transform_target_values(train_target)
-#classification_test_target = transform_target_values(test_target)
+classification_train_target = transform_target_values(train_target)
+classification_test_target = transform_target_values(test_target)
 
 #### Train models
 
 ## Classification models
-correlation_matrix(ww_dataset, 'plots/corr.png')
+#correlation_matrix(ww_dataset, 'plots/corr.png')
 
 ## Classification models
   
   #x_vs_y(ww_dataset_values[:,i], ww_feature_labels[i], ww_dataset_values[:,11], ww_target_label, '%s vs quality' % ww_feature_labels[i], 'plots/scatters/%s.png' % i)
-  
-  #logistic_regression = fit_logistic_regression(np.reshape(train_features[:,i], (-1, 1)),
-   #                                             classification_train_target)
-  #decision_tree = fit_decision_tree(np.reshape(train_features[:,i], (-1, 1)),
-    #                                classification_train_target)
-  
-  ## Models accuracy
-  #print('Logistic regression accuracy: ')
-  #print(logistic_regression.score(np.reshape(test_features[:,i], (-1, 1)),
-     #                             classification_test_target))
-  #print('Decision tree accuracy: ')
-  #print(decision_tree.score(np.reshape(test_features[:,i], (-1, 1)),
-      #                      classification_test_target))
 
-
-  
-  #dot_data = tree.export_graphviz(decision_tree, out_file='plots/%s.gv' % i,
-#                                  feature_names=ww_feature_labels[i:i+1],
- #                                 class_names=ww_target_label,
-  #                                filled=True, rounded=True,
-  #                                special_characters=True)
-
-
-# logistic_regression = fit_logistic_regression(train_features[:, [5,6]],
+# 5,6,10 are very important
+#columns = [3, 6, 7, 10] 
+#columns = [2, 3, 6, 7, 10] # Good one
+#columns = [2, 3, 4, 5, 6, 7, 10] # Better one
+#columns = [2, 4, 5, 6, 7, 10] # Even better
+columns = [1, 2, 5, 6, 7, 10] # OMG THIS ONE
+#columns = [3, 6]
+#columns = [3, 7]
+#columns = [3, 10]
+# logistic_regression = fit_logistic_regression(train_features[:, columns],
 #                                               classification_train_target)
-  
-# decision_tree = fit_decision_tree(train_features[:, [5,6]],
+# decision_tree = fit_decision_tree(train_features[:, columns],
 #                                   classification_train_target)
   
 # ## Models accuracy
 # print('Logistic regression accuracy: ')
-# print(logistic_regression.score(test_features[:, [5,6]],
+# print(logistic_regression.score(test_features[:, columns],
 #                                 classification_test_target))
 # print('Decision tree accuracy: ')
-# print(decision_tree.score(test_features[:, [5,6]],
+# print(decision_tree.score(test_features[:, columns],
 #                           classification_test_target))
 
+
+# labels = []
+# for i in columns:
+#   labels.append(ww_feature_labels[i])
+
+# dot_data = tree.export_graphviz(decision_tree, out_file='plots/def-0.gv',
+#                                 feature_names=labels,
+#                                 class_names=ww_target_label,
+#                                 filled=True, rounded=True,
+#                                 special_characters=True)
   
 ## Linear regression
 
-# linear_regression = fit_linear_regression(train_features, train_target)
+linear_regression = fit_linear_regression(train_features[:, columns], train_target)
 
-# from sklearn.feature_selection import chi2
-
-# scores, pvalues = chi2(ww_dataset_values[:,:11], ww_dataset_values[:,11])
+import regressor
+regressor.summary(linear_regression, train_features[:, columns], train_target, labels)
                            
-# print('Linear regression accuracy: ')
-# print(linear_regression.score(test_features, test_target))
+print('Linear regression accuracy: ')
+print(linear_regression.score(test_features[:, columns], test_target))
 
-# print('P-values: ')
-# print(ww_feature_labels)
-# print(pvalues)
+#print('P-values: ')
+#print(labels)
+#print(pvalues)
 
 ## Plotts
 

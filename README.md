@@ -14,6 +14,7 @@ $ conda install -n <your-env> pandas
 $ conda install -n <your-env> graphviz
 $ conda install -n <your-env> python-graphviz
 $ conda install -n <your-env> matplotlib
+$ conda install -n <your-env> seaborn
 ```
 
 Visualize graphs( .gz).
