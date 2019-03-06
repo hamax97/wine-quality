@@ -5,7 +5,7 @@ def read_csv(location, sep=';'):
   # File reader library
   import pandas as pd
 
-  data = pd.read_csv(location, sep)
+  data = pd.read_csv(location, sep, usecols=[0,1,2,3,4,5,6,7,8,9,10])
   return data
 
 ##################### Split dataset into training and test datasets
@@ -66,6 +66,7 @@ def fit_linear_regression(train_features, train_target):
 ##################### Plotts and Graphs
 
 import matplotlib.pyplot as plt
+import seaborn as sns
 
 def x_vs_y(x, x_label, y, y_label, title, save_path):
   plt.figure()
@@ -73,6 +74,32 @@ def x_vs_y(x, x_label, y, y_label, title, save_path):
   plt.xlabel(x_label)
   plt.ylabel(y_label)
   plt.title(title)
+  plt.savefig(save_path)
+
+def correlation_matrix(frame, save_path):
+
+  #Create Correlation df
+  corr = frame.corr()
+  print(corr.columns)
+  #Plot figsize
+  fig, ax = plt.subplots(figsize=(12, 14))
+  #Generate Color Map
+  colormap = sns.diverging_palette(220, 10, as_cmap=True)
+  #Generate Heat Map, allow annotations and place floats in map
+  sns.heatmap(corr, cmap=colormap, annot=True, fmt=".2f")
+  #Apply xticks
+  plt.xticks(range(len(corr.columns)), corr.columns);
+  #Apply yticks
+  plt.yticks(range(len(corr.columns)), corr.columns)
+  plt.title('correlation matrix')
+  #show plot
+  #plt.show()
+
+  #sns.heatmap(frame.corr(), annot=True, fmt=".2f")
+  #plt.matshow(frame.corr())
+  #plt.xticks(range(len(frame.columns)), frame.columns)
+  #plt.yticks(range(len(frame.columns)), frame.columns)
+  #plt.colorbar()
   plt.savefig(save_path)
 
 ##################### Main
@@ -84,29 +111,28 @@ import numpy as np
 
 ## White wine dataset
 ww_dataset = read_csv(location = sys.argv[1])
-ww_feature_labels = list(ww_dataset)[:11]
-ww_target_label = list(ww_dataset)[11]
+#ww_feature_labels = list(ww_dataset)[:11]
+#ww_target_label = list(ww_dataset)[11]
 # Converts dataset into matrix
 ww_dataset_values = ww_dataset.to_numpy()
 
 ## Split dataset into train and test
-train_features, test_features, train_target, test_target = \
-  split_dataset(ww_dataset_values)
+#train_features, test_features, train_target, test_target = \
+#  split_dataset(ww_dataset_values)
 
 # Used to train the classification models
-classification_train_target = transform_target_values(train_target)
-classification_test_target = transform_target_values(test_target)
+#classification_train_target = transform_target_values(train_target)
+#classification_test_target = transform_target_values(test_target)
 
 #### Train models
 
 ## Classification models
+correlation_matrix(ww_dataset, 'plots/corr.png')
 
 ## Classification models
-for i in range(11):
-
-  x_vs_y(ww_dataset_values[:,i], ww_feature_labels[i], ww_dataset_values[:,11], ww_target_label, '%s vs quality' % ww_feature_labels[i], 'plots/scatters/%s.png' % i)
   
-  print(i)
+  #x_vs_y(ww_dataset_values[:,i], ww_feature_labels[i], ww_dataset_values[:,11], ww_target_label, '%s vs quality' % ww_feature_labels[i], 'plots/scatters/%s.png' % i)
+  
   #logistic_regression = fit_logistic_regression(np.reshape(train_features[:,i], (-1, 1)),
    #                                             classification_train_target)
   #decision_tree = fit_decision_tree(np.reshape(train_features[:,i], (-1, 1)),
@@ -167,4 +193,19 @@ for i in range(11):
 #                                 class_names=ww_target_label,
 #                                 filled=True, rounded=True,
 #                                 special_characters=True)
+
+
+# good = bad = 0
+# for i in range(len(ww_dataset_values[:,11])):
+
+#   if ww_dataset_values[i, 11] > 5:
+#     good += 1
+#   else:
+#     bad += 1
+
+# print('good ')
+# print(good)
+# print('bad ')
+# print(bad)
+# print(good + bad)
 
